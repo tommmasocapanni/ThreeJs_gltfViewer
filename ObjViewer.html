@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Three.js Scene with Mouse Controls and Custom 3D Model</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.130.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.130.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.130.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.130.0/examples/js/loaders/GLTFLoader.js"></script>
+
+    <script>
+        // Inizializzazione della scena
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Aggiunta dello sfondo grigio
+        scene.background = new THREE.Color(0xeeeeee);
+
+        // // Creazione del cubo rosso
+        // var geometry = new THREE.BoxGeometry();
+        // var material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        // var cube = new THREE.Mesh(geometry, material);
+        // scene.add(cube);
+
+        // // Posizionamento del cubo al centro della scena
+        // cube.position.set(0, 0, 0);
+
+        // // Caricamento del modello OBJ
+        // var loader = new THREE.OBJLoader();
+        // loader.load(
+        //     'model/Porsche 911 Carrera 1983/scene.gltf',
+        //     function (object) {
+        //         scene.add(object);
+        //     },
+        //     function (xhr) {
+        //         console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        //     },
+        //     function (error) {
+        //         console.error('An error occurred loading the model:', error);
+        //     }
+        // );
+
+        // Caricamento del modello glTF
+        var loader = new THREE.GLTFLoader();
+        loader.load(
+            // 'path/to/your/model.gltf',
+            'model/Porsche 911 Carrera 1983/scene.gltf',
+            function (gltf) {
+                scene.add(gltf.scene);
+            },
+            function (xhr) {
+                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+            },
+            function (error) {
+                console.error('An error occurred loading the model:', error);
+            }
+        );
+
+
+        // // Creazione del sistema di particelle per il fumo
+        // var smokeTexture = new THREE.TextureLoader().load('tex/Smoke Texture.png');
+        // var smokeMaterial = new THREE.PointsMaterial({
+        //     map: smokeTexture,
+        //     color: 0x888888,
+        //     transparent: true,
+        //     blending: THREE.AdditiveBlending,
+        //     size: 0.5,
+        //     opacity: 0.5
+        // });
+        // var smokeGeometry = new THREE.BufferGeometry();
+        // var position = [];
+        // for (let i = 0; i < 1000; i++) {
+        //     var x = Math.random() * 10 - 5;
+        //     var y = Math.random() * 10 - 5;
+        //     var z = Math.random() * 10 - 5;
+        //     positions.push(x, y, z);
+        // }
+        // smokeGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        // var smokeParticles = new THREE.Points(smokeGeometry, smokeMaterial);
+        // scene.add(smokeParticles);
+
+
+        
+        // LUCE AMBIENTALE
+        var ambientLight = new THREE.AmbientLight(0xffffff, 10); // colore, intensità
+        scene.add(ambientLight);
+
+
+        // Aggiunta dei controlli per muoversi con il mouse
+        var controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.25;
+        controls.enableZoom = true;
+
+        // Posizionamento della telecamera
+        camera.position.set(0, 2, 2);
+        camera.lookAt(0, 0, 0);
+
+        // Add vibration to camera
+        const cameraVibration = 0.05; // Adjust vibration intensity
+        function vibrateCamera() {
+            camera.position.x += (Math.random() - 0.5) * cameraVibration*0.1;
+            camera.position.y += (Math.random() - 0.5) * cameraVibration*0.1;
+        }
+
+
+
+        //*RENDERING*
+        // Funzione di aggiornamento della scena
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Apply camera vibration
+            vibrateCamera();
+
+            controls.update(); // Aggiorna i controlli
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        // Aggiustamento della dimensione della finestra
+        window.addEventListener('resize', function () {
+            var width = window.innerWidth;
+            var height = window.innerHeight;
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>
